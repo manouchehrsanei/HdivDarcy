@@ -12,12 +12,7 @@
 #include "pzanalysis.h"
 #include "pzbndcond.h"
 #include "DarcyPTest.h"
-#include "StokesTest.h"
-#include "HStokesTest.h"
-#include "CoupledTest.h"
 
-#include "TPZCouplingDSMaterial.h"
-#include "TPZStokesMaterial.h"
 #include "TPZDarcyPMaterial.h"
 #include <pzgeoel.h>
 #include "pzgeoelbc.h"
@@ -74,56 +69,14 @@ int main(int argc, char *argv[])
     int nx=nelx+1 ,ny=nely+1; //Número de nos em x  y
     int pOrder = 2; //Ordem polinomial de aproximação
     
-    if (HStokesDomain) {
 
-        //Coeficiente estabilização (Stokes)
-        STATE hE=hx/h_level;
-        STATE s0=2.0;
-      
-        h_level = 8;
-        for (int it=0; it<=0.; it++) {
-            nx=h_level+1 ,ny=h_level+1;
-            hE=hx/h_level;
-            STATE sigma=s0*(pOrder*pOrder)/hE;
-            HStokesTest * Test0 = new HStokesTest();
-            Test0->Run(SpaceHDiv, pOrder, nx, ny, hx, hy,visco,theta,sigma);
-            //h_level = h_level*2;
-        }
-            
-    }
-    else if (DarcyDomain) {
+  if (DarcyDomain)
+  {
         DarcyPTest * Test1 = new DarcyPTest();
         Test1->Run(SpaceHDiv, pOrder, nx, ny, hx, hy,visco,permeability,theta);
-    }
-    else if (StokesDomain)
-    {
-        pOrder = 1;
+  }
 
-        TPZVec<STATE> S0(13,0.);
-        S0[0]=0.0000001,S0[1]=1.,S0[2]=3.,S0[3]=5.,S0[4]=10.,S0[5]=15.,S0[6]=20.,S0[7]=25.,S0[8]=30.,S0[9]=35.,S0[10]=40.,S0[11]=45.,S0[12]=50.;
-        HDivPiola = 0;
-        for (int it=0; it<=0.; it++) {
-            h_level = 1;
-            //Coeficiente estabilização (Stokes)
-            STATE hE=hx/h_level;
-            STATE s0=20.;
-            STATE sigma=s0*(pOrder*pOrder)/hE;
-            
-            
-            nx=h_level+1 ,ny=h_level+1;
-            hE=hx/h_level;
-            sigma=s0*(pOrder*pOrder)/hE;
-            StokesTest  * Test1 = new StokesTest();
-            Test1->Run(SpaceHDiv, pOrder, nx, ny, hx, hy,visco,theta,sigma);
-            //h_level = h_level*2;
-        }
-        
-    }
-    else  if(CoupledDomain)
-    {
-        CoupledTest  * Test3 = new CoupledTest();
-        Test3->Run(SpaceHDiv, pOrder, nx, ny, hx, hy,visco,permeability,theta);
-    }
+
     
     return 0;
 }
@@ -372,7 +325,7 @@ TPZGeoMesh *CreateGMesh(int nx, int ny, double hx, double hy, double r)
     std::string dirname = PZSOURCEDIR;
     std::string grid;
     
-    grid = dirname + "/Projects/CreepStokes/gmsh_meshes/msh/GeometryTest.msh";
+    grid = dirname + "/Users/manouchehr/Documents/GitHub/HdivDarcy/GeometryTest.msh";
     
     TPZGmshReader Geometry;
     REAL s = 1.0;
