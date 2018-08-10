@@ -1,15 +1,14 @@
-/*
- *  DarcyPTest.cpp
- *  PZ
- *
- *  Created by Pablo Carvalho on 28/07/2017.
- *  Copyright 2017 __MyCompanyName__. All rights reserved.
- *
- */
+//
+//  DarcyTest.h
+//  PZ
+//
+//  Created by Manouchehr on August 10, 2018.
+//
+//
 
 
-#ifndef __PZ__DarcyPTest__
-#define __PZ__DarcyPTest__
+#ifndef __PZ__DarcyTest__
+#define __PZ__DarcyTest__
 
 #include <cmath>
 #include <set>
@@ -22,7 +21,7 @@
 #include "TPZVTKGeoMesh.h"
 #include "pzanalysis.h"
 #include "pzbndcond.h"
-#include "TPZDarcyPMaterial.h"
+#include "TPZDarcyMaterial.h"
 
 #include <pzgeoel.h>
 #include "pzgeoelbc.h"
@@ -48,31 +47,31 @@
 using namespace std;
 using namespace pzshape;
 
-class DarcyPTest{
+class DarcyTest{
 private:
     
-    int fdim; //Dimensão do problema
-    int fmatID; //Materia do elemento volumétrico
+    int fdim; // Dimension of the problem
+    int fmatID; // Material id
     
-    //Materiais das condições de contorno
+    // Material of contour
     int fmatBCbott;
     int fmatBCtop;
     int fmatBCleft;
     int fmatBCright;
     
-    //Material do elemento de interface
+    // Material of interface
     int fmatInterface;
     
-    //Materiais das condições de contorno (elementos de interface)
+    // Material of contour of interface
     int fmatIntBCbott;
     int fmatIntBCtop;
     int fmatIntBCleft;
     int fmatIntBCright;
     
-    //Materia de um ponto
+    // Material of point
     int fmatPoint;
     
-    //Condições de contorno do problema
+    // Boundary condition
     int fdirichlet;
     int fneumann;
     int fpenetration;
@@ -80,9 +79,9 @@ private:
     int fdirichletvar;
     
     
-    int fquadmat1; //Parte inferior do quadrado
-    int fquadmat2; //Parte superior do quadrado
-    int fquadmat3; //Material de interface
+    int fquadmat1; //Bottom of the square
+    int fquadmat2; //Top of the square
+    int fquadmat3; //Material of interface
     
     STATE fviscosity;
     STATE fpermeability;
@@ -94,20 +93,18 @@ public:
     bool fisH1;
     
     
-    DarcyPTest();
+    DarcyTest();
     
-    ~DarcyPTest();
+    ~DarcyTest();
     
     void Run(int Space, int pOrder, int nx, int ny, double hx, double hy, STATE visco, STATE permeability, STATE theta);
     
-    /*  Malhas geometricas */
+    /*  Geometry mesh */
     TPZGeoMesh *CreateGMesh(int nx, int ny, double hx, double hy);
-    
     //   TPZGeoMesh *GMeshDeformed(int dim, bool ftriang, int ndiv);
     
     
-    /* Malhas computacionais */
-    
+    /* Computational mesh */
     TPZCompEl *CreateInterfaceEl(TPZGeoEl *gel,TPZCompMesh &mesh,int64_t &index);
     
     TPZCompMesh *CMesh_v(TPZGeoMesh *gmesh, int Space, int pOrder);
@@ -115,16 +112,14 @@ public:
     TPZCompMesh *CMesh_m(TPZGeoMesh *gmesh, int Space, int pOrder, STATE visco, STATE permeability, STATE theta);
     
     
-    //solucao exata
+    // Exact solution
     static void Sol_exact(const TPZVec<REAL> &x, TPZVec<STATE> &sol, TPZFMatrix<STATE> &dsol);
     
-    //lado direito da equacao
+    // Right side of the equation
     static void F_source(const TPZVec<REAL> &x, TPZVec<STATE> &f, TPZFMatrix<STATE>& gradu);
     
     // static void AddMultiphysicsInterfaces(TPZCompMesh &cmesh, int matfrom, int mattarget);
     static void AddMultiphysicsInterfaces(TPZCompMesh &cmesh, int matfrom, int mattarget);
-    
-    
     
     
 };

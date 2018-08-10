@@ -1,11 +1,10 @@
-/*
- *  TPZDarcyPMaterial.h
- *  PZ
- *
- *  Created by Pablo G S Carvalho on 08/09/16.
- *  Copyright 2016 __MyCompanyName__. All rights reserved.
- *
- */
+//
+//  TPZDarcyMaterial.h
+//  PZ
+//
+//  Created by Manouchehr on August 10, 2018.
+//
+//
 
 #include "TPZMatWithMem.h"
 #include "pzdiscgal.h"
@@ -21,7 +20,7 @@
 
 
 
-class TPZDarcyPMaterial : public TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >  {
+class TPZDarcyMaterial : public TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >  {
     
 private:
     
@@ -47,23 +46,23 @@ public:
     /**
      * Empty Constructor
      */
-    TPZDarcyPMaterial();
+    TPZDarcyMaterial();
     
     /** Creates a material object and inserts it in the vector of
      *  material pointers of the mesh.
      */
-    TPZDarcyPMaterial(int matid, int dimension, int space, STATE viscosity, STATE permeability, STATE theta);
+    TPZDarcyMaterial(int matid, int dimension, int space, STATE viscosity, STATE permeability, STATE theta);
     
     
     /** Creates a material object based on the referred object and
      *  inserts it in the vector of material pointers of the mesh.
      */
-    TPZDarcyPMaterial(const TPZDarcyPMaterial &mat);
+    TPZDarcyMaterial(const TPZDarcyMaterial &mat);
     
     /**
      * Destructor
      */
-    ~TPZDarcyPMaterial();
+    ~TPZDarcyMaterial();
     
     /** Fill material data parameter with necessary requirements for the
      * Contribute method. Here, in base class, all requirements are considered
@@ -80,13 +79,14 @@ public:
     
     void FillBoundaryConditionDataRequirement(int type,TPZVec<TPZMaterialData> &datavec);
     
-    void SetPermeability(REAL perm) {
+    void SetPermeability(REAL perm)
+    {
         fk = perm;
     }
     
     /** returns the name of the material */
     std::string Name() {
-        return "TPZDarcyPMaterial";
+        return "TPZDarcyMaterial";
     }
     
     /** returns the integrable dimension of the material */

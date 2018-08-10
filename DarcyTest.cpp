@@ -1,68 +1,68 @@
-/*
- *  DarcyPTest.cpp
- *  PZ
- *
- *  Created by Pablo Carvalho on 28/07/2017.
- *  Copyright 2017 __MyCompanyName__. All rights reserved.
- *
- */
+//
+//  DarcyPTest.cpp
+//  PZ
+//
+//  Created by Manouchehr on August 10, 2018.
+//
+//
 
-#include "DarcyPTest.h"
+#include "DarcyTest.h"
 #include "pzcheckgeom.h"
 #include "pzstack.h"
 
 
-DarcyPTest::DarcyPTest()
+DarcyTest::DarcyTest()
 {
     
-    fdim=2; //Dimensão do problema
-    fmatID=1; //Materia do elemento volumétrico
+    fdim           = 2; //Dimensão do problema
+    fmatID         = 1; //Materia do elemento volumétrico
     
     //Materiais das condições de contorno
-    fmatBCbott=-1;
-    fmatBCtop=-2;
-    fmatBCleft=-3;
-    fmatBCright=-4;
+    fmatBCbott     = -1;
+    fmatBCtop      = -2;
+    fmatBCleft     = -3;
+    fmatBCright    = -4;
     
     //Material do elemento de interface
-    fmatInterface=4;
+    fmatInterface  =  4;
     
     //Materiais das condições de contorno (elementos de interface)
-    fmatIntBCbott=-11;
-    fmatIntBCtop=-12;
-    fmatIntBCleft=-13;
-    fmatIntBCright=-14;
+    fmatIntBCbott  = -11;
+    fmatIntBCtop   = -12;
+    fmatIntBCleft  = -13;
+    fmatIntBCright = -14;
     
     //Materia de um ponto
-    fmatPoint=-5;
+    fmatPoint      = -5;
     
     //Condições de contorno do problema
-    fdirichlet=0;
-    fneumann=1;
-    fpenetration=2;
-    fpointtype=5;
-    fdirichletvar=4;
+    fdirichlet     = 0;
+    fneumann       = 1;
+    fpenetration   = 2;
+    fpointtype     = 5;
+    fdirichletvar  = 4;
     
     
-    fquadmat1=1; //Parte inferior do quadrado
-    fquadmat2=2; //Parte superior do quadrado
-    fquadmat3=3; //Material de interface
+    fquadmat1      = 1; //Parte inferior do quadrado
+    fquadmat2      = 2; //Parte superior do quadrado
+    fquadmat3      = 3; //Material de interface
     
-    fviscosity=1.;
-    fpermeability=1.;
-    ftheta=-1.;
+    fviscosity     = 1.;
+    fpermeability  = 1.;
+    ftheta         = -1.;
     
 }
 
-DarcyPTest::~DarcyPTest()
+DarcyTest::~DarcyTest()
 {
     
 }
 
-void DarcyPTest::Run(int Space, int pOrder, int nx, int ny, double hx, double hy, STATE visco, STATE permeability, STATE theta)
+void DarcyTest::Run(int Space, int pOrder, int nx, int ny, double hx, double hy, STATE visco, STATE permeability, STATE theta)
 {
     
-    if (Space == 1) {
+    if (Space == 1)
+    {
         HDivPiola = 1;
     }
     
@@ -201,272 +201,51 @@ void DarcyPTest::Run(int Space, int pOrder, int nx, int ny, double hx, double hy
     std::cout << "FINISHED!" << std::endl;
 }
 
-/*
-TPZGeoMesh *DarcyPTest::CreateGMesh(int nx, int ny, double hx, double hy)
+
+// Creating geometric mesh
+TPZGeoMesh *DarcyTest::CreateGMesh(int nx, int ny, double hx, double hy)
 {
     
-    int i,j;
     int64_t id, index;
-    
-    //Criando malha geométrica, nós e elementos.
-    //Inserindo nós e elementos no objeto malha:
+    int dim = 2;
     
     TPZGeoMesh *gmesh = new TPZGeoMesh();
-    gmesh->SetDimension(2);
-    
-    //Vetor auxiliar para armazenar coordenadas:
+    gmesh->SetDimension(dim);
     
     TPZVec <REAL> coord (3,0.);
     
-    
-    //Inicialização dos nós:
-    
-    for(i = 0; i < ny; i++){
-        for(j = 0; j < nx; j++){
-            id = i*nx + j;
-            coord[0] = (j)*hx/(nx - 1);
-            coord[1] = (i)*hy/(ny - 1);
-            //using the same coordinate x for z
-            coord[2] = 0.;
-            //cout << coord << endl;
-            //Get the index in the mesh nodes vector for the new node
-            index = gmesh->NodeVec().AllocateNewElement();
-            //Set the value of the node in the mesh nodes vector
-            gmesh->NodeVec()[index] = TPZGeoNode(id,coord,*gmesh);
-        }
-    }
-    
-    //Ponto 1
-    TPZVec<int64_t> pointtopology(1);
-    pointtopology[0] = 0;
-    
-    gmesh->CreateGeoElement(EPoint,pointtopology,fmatPoint,id);
-    
-    
-    //Vetor auxiliar para armazenar as conecções entre elementos:
-    
-    TPZVec <int64_t> connect(4,0);
-    
-    
-    //Conectividade dos elementos (triangulos):
-    
-    for(i = 0; i < (ny - 1); i++){
-        for(j = 0; j < (nx - 1); j++){
-            //index = (i)*(nx - 1)+ (j);
-            connect[0] = (i)*ny + (j);
-            connect[1] = connect[0]+1;
-            connect[2] = connect[1]+(nx-1);
-            gmesh->CreateGeoElement(ETriangle,connect,fmatID,id);
-            connect[0] = connect[1];
-            connect[1] = connect[2]+1;
-            connect[2] = connect[1]-1;
-            gmesh->CreateGeoElement(ETriangle,connect,fmatID,id);
-        }
-    }
-    
-    
-    //Gerando informação da vizinhança:
-    
-    gmesh->BuildConnectivity();
-    
+    // Initialization of nodes:
+    for(int i = 0; i < ny; i++)
     {
-        TPZCheckGeom check(gmesh);
-        check.CheckUniqueId();
-    }
-    int64_t el, numelements = gmesh->NElements();
-    
-    TPZManVector <int64_t> TopolPlate(4);
-    
-    for (el=0; el<numelements; el++)
-    {
-        int64_t totalnodes = gmesh->ElementVec()[el]->NNodes();
-        TPZGeoEl *plate = gmesh->ElementVec()[el];
-        for (int i=0; i<4; i++){
-            TopolPlate[i] = plate->NodeIndex(i);
-        }
-        
-        //Colocando as condicoes de contorno:
-        TPZManVector <TPZGeoNode> Nodefinder(totalnodes);
-        TPZManVector <REAL,3> nodecoord(3);
-        
-        //Na face x = 1
-        TPZVec<int64_t> ncoordzbottVec(0); int64_t sizeOfbottVec = 0;
-        TPZVec<int64_t> ncoordztopVec(0); int64_t sizeOftopVec = 0;
-        TPZVec<int64_t> ncoordzleftVec(0); int64_t sizeOfleftVec = 0;
-        TPZVec<int64_t> ncoordzrightVec(0); int64_t sizeOfrightVec = 0;
-        
-        for (int64_t i = 0; i < totalnodes; i++)
+        for(int j = 0; j < nx; j++)
         {
-            Nodefinder[i] = gmesh->NodeVec()[TopolPlate[i]];
-            Nodefinder[i].GetCoordinates(nodecoord);
-            if (nodecoord[2] == 0. & nodecoord[1] == 0.)
-            {
-                sizeOfbottVec++;
-                ncoordzbottVec.Resize(sizeOfbottVec);
-                ncoordzbottVec[sizeOfbottVec-1] = TopolPlate[i];
-            }
-            if (nodecoord[2] == 0. & nodecoord[1] == hy)
-            {
-                sizeOftopVec++;
-                ncoordztopVec.Resize(sizeOftopVec);
-                ncoordztopVec[sizeOftopVec-1] = TopolPlate[i];
-            }
-            if (nodecoord[2] == 0. & nodecoord[0] == 0.)
-            {
-                sizeOfleftVec++;
-                ncoordzleftVec.Resize(sizeOfleftVec);
-                ncoordzleftVec[sizeOfleftVec-1] = TopolPlate[i];
-            }
-            if (nodecoord[2] == 0. & nodecoord[0] == hx)
-            {
-                sizeOfrightVec++;
-                ncoordzrightVec.Resize(sizeOfrightVec);
-                ncoordzrightVec[sizeOfrightVec-1] = TopolPlate[i];
-            }
-        }
-        
-        if (sizeOfbottVec == 2) {
-            int sidesbott = plate->WhichSide(ncoordzbottVec);
-            TPZGeoElSide platesidebott(plate, sidesbott);
-            TPZGeoElBC(platesidebott,fmatBCbott);
-            TPZGeoElBC(platesidebott,fmatIntBCbott);
-        }
-        
-        if (sizeOftopVec == 2) {
-            int sidestop = plate->WhichSide(ncoordztopVec);
-            TPZGeoElSide platesidetop(plate, sidestop);
-            TPZGeoElBC(platesidetop,fmatBCtop);
-            TPZGeoElBC(platesidetop,fmatIntBCtop);
-        }
-        
-        if (sizeOfleftVec == 2) {
-            int sidesleft = plate->WhichSide(ncoordzleftVec);
-            TPZGeoElSide platesideleft(plate, sidesleft);
-            TPZGeoElBC(platesideleft,fmatBCleft);
-            TPZGeoElBC(platesideleft,fmatIntBCleft);
-        }
-        
-        if (sizeOfrightVec == 2) {
-            int sidesright = plate->WhichSide(ncoordzrightVec);
-            TPZGeoElSide platesideright(plate, sidesright);
-            TPZGeoElBC(platesideright,fmatBCright);
-            TPZGeoElBC(platesideright,fmatIntBCright);
-        }
-        
-        
-        ncoordzbottVec.Resize(0);
-        sizeOfbottVec = 0;
-        ncoordztopVec.Resize(0);
-        sizeOftopVec = 0;
-        ncoordzleftVec.Resize(0);
-        sizeOfleftVec = 0;
-        ncoordzrightVec.Resize(0);
-        sizeOfrightVec = 0;
-        
-    }
-    
-    
-    //Criando interface (Geralizado):
-    
-    TPZVec<int64_t> nodint(2);
-    for(i = 0; i < (ny - 1); i++){
-        for(j = 0; j < nx; j++){
-            if(j>0&&j<(nx-1)){
-                nodint[0]=j+nx*i;
-                nodint[1]=j+nx*(i+1);
-                gmesh->CreateGeoElement(EOned, nodint, fmatInterface, index); //Criando elemento de interface (GeoElement)
-                
-            }
-            if(j>0&&j<nx){
-                nodint[0]=j+ny*i;
-                nodint[1]=j+ny*i+nx-1;
-                gmesh->CreateGeoElement(EOned, nodint, fmatInterface, index); //Criando elemento de interface (GeoElement)
-                
-            }
-            if(i>0&&j<(ny-1)){
-                nodint[0]=j+ny*i;
-                nodint[1]=j+ny*i+1;
-                gmesh->CreateGeoElement(EOned, nodint, fmatInterface, index); //Criando elemento de interface (GeoElement)
-                
-            }
-            
-        }
-    }
-    
-    
-    //new TPZGeoElRefPattern< pzgeom::TPZGeoLinear > (nodind3,matInterface,*gmesh); //Criando elemento de interface (RefPattern)
-    id++;
-    
-    TPZCheckGeom check(gmesh);
-    check.CheckUniqueId();
-    
-    gmesh->BuildConnectivity();
-
-    
-    //Impressão da malha geométrica:
-    
-    int n_div = 0;
-    ofstream bf("before.vtk");
-    TPZVTKGeoMesh::PrintGMeshVTK(gmesh, bf);
-    return gmesh;
-    
-    
-}
-*/
- 
-
-TPZGeoMesh *DarcyPTest::CreateGMesh(int nx, int ny, double hx, double hy)
-{
-    
-    int i,j;
-    int64_t id, index;
-    
-    
-    //Criando malha geométrica, nós e elementos.
-    //Inserindo nós e elementos no objeto malha:
-    
-    TPZGeoMesh *gmesh = new TPZGeoMesh();
-    gmesh->SetDimension(2);
-    
-    //Vetor auxiliar para armazenar coordenadas:
-    
-    TPZVec <REAL> coord (3,0.);
-    
-    
-    //Inicialização dos nós:
-    
-    for(i = 0; i < ny; i++){
-        for(j = 0; j < nx; j++){
             id = i*nx + j;
             coord[0] = (j)*hx/(nx - 1);
             coord[1] = (i)*hy/(ny - 1);
-            //using the same coordinate x for z
             coord[2] = 0.;
-            //cout << coord << endl;
-            //Get the index in the mesh nodes vector for the new node
+            //Get the index of the node
             index = gmesh->NodeVec().AllocateNewElement();
             //Set the value of the node in the mesh nodes vector
             gmesh->NodeVec()[index] = TPZGeoNode(id,coord,*gmesh);
         }
     }
     
-    //Ponto 1
+    // Point 1
     TPZVec<int64_t> pointtopology(1);
     pointtopology[0] = 0;
     
     gmesh->CreateGeoElement(EPoint,pointtopology,fmatPoint,id);
     
     
-    //Vetor auxiliar para armazenar as conecções entre elementos:
-    
+    // Auxiliary vector to store the connections between elements:
     TPZVec <int64_t> connect(4,0);
     
-    
-    //Conectividade dos elementos:
-    
-    for(i = 0; i < (ny - 1); i++){
-        for(j = 0; j < (nx - 1); j++){
-            index = (i)*(nx - 1)+ (j);
+    // Connectivity of elements:
+    for(int i = 0; i < (ny - 1); i++)
+    {
+        for(int j = 0; j < (nx - 1); j++)
+        {
+            index      = (i)*(nx - 1)+ (j);
             connect[0] = (i)*ny + (j);
             connect[1] = connect[0]+1;
             connect[2] = connect[1]+(nx);
@@ -476,35 +255,40 @@ TPZGeoMesh *DarcyPTest::CreateGMesh(int nx, int ny, double hx, double hy)
     }
     
     
-    //Gerando informação da vizinhança:
-    
+   // Generating neighborhood information:
     gmesh->BuildConnectivity();
     
     {
         TPZCheckGeom check(gmesh);
         check.CheckUniqueId();
     }
-    int64_t el, numelements = gmesh->NElements();
     
+    int64_t el, numelements = gmesh->NElements();
     TPZManVector <int64_t> TopolPlate(4);
     
     for (el=0; el<numelements; el++)
     {
         int64_t totalnodes = gmesh->ElementVec()[el]->NNodes();
         TPZGeoEl *plate = gmesh->ElementVec()[el];
-        for (int i=0; i<4; i++){
+        for (int i=0; i<4; i++)
+        {
             TopolPlate[i] = plate->NodeIndex(i);
         }
         
-        //Colocando as condicoes de contorno:
+        // The boundary conditions:
         TPZManVector <TPZGeoNode> Nodefinder(totalnodes);
         TPZManVector <REAL,3> nodecoord(3);
         
-        //Na face x = 1
-        TPZVec<int64_t> ncoordzbottVec(0); int64_t sizeOfbottVec = 0;
-        TPZVec<int64_t> ncoordztopVec(0); int64_t sizeOftopVec = 0;
-        TPZVec<int64_t> ncoordzleftVec(0); int64_t sizeOfleftVec = 0;
-        TPZVec<int64_t> ncoordzrightVec(0); int64_t sizeOfrightVec = 0;
+        // In face x = 1
+        TPZVec<int64_t> ncoordzbottVec(0);
+        TPZVec<int64_t> ncoordztopVec(0);
+        TPZVec<int64_t> ncoordzleftVec(0);
+        TPZVec<int64_t> ncoordzrightVec(0);
+        
+        int64_t sizeOfbottVec = 0;
+        int64_t sizeOftopVec = 0;
+        int64_t sizeOfleftVec = 0;
+        int64_t sizeOfrightVec = 0;
         
         for (int64_t i = 0; i < totalnodes; i++)
         {
@@ -536,28 +320,32 @@ TPZGeoMesh *DarcyPTest::CreateGMesh(int nx, int ny, double hx, double hy)
             }
         }
         
-        if (sizeOfbottVec == 2) {
+        if (sizeOfbottVec == 2)
+        {
             int sidesbott = plate->WhichSide(ncoordzbottVec);
             TPZGeoElSide platesidebott(plate, sidesbott);
             TPZGeoElBC(platesidebott,fmatBCbott);
             TPZGeoElBC(platesidebott,fmatIntBCbott);
         }
         
-        if (sizeOftopVec == 2) {
+        if (sizeOftopVec == 2)
+        {
             int sidestop = plate->WhichSide(ncoordztopVec);
             TPZGeoElSide platesidetop(plate, sidestop);
             TPZGeoElBC(platesidetop,fmatBCtop);
             TPZGeoElBC(platesidetop,fmatIntBCtop);
         }
         
-        if (sizeOfleftVec == 2) {
+        if (sizeOfleftVec == 2)
+        {
             int sidesleft = plate->WhichSide(ncoordzleftVec);
             TPZGeoElSide platesideleft(plate, sidesleft);
             TPZGeoElBC(platesideleft,fmatBCleft);
             TPZGeoElBC(platesideleft,fmatIntBCleft);
         }
         
-        if (sizeOfrightVec == 2) {
+        if (sizeOfrightVec == 2)
+        {
             int sidesright = plate->WhichSide(ncoordzrightVec);
             TPZGeoElSide platesideright(plate, sidesright);
             TPZGeoElBC(platesideright,fmatBCright);
@@ -576,30 +364,34 @@ TPZGeoMesh *DarcyPTest::CreateGMesh(int nx, int ny, double hx, double hy)
         
     }
     
-    // Criando e inserindo elemento de interface:
+    // Creating and inserting interface element:
     //    TPZVec<int64_t> nodind3(2);
     //
     //    nodind3[0]=1;
     //    nodind3[1]=4;
     //
-    //    gmesh->CreateGeoElement(EOned, nodind3, matInterface, index); //Criando elemento de interface (GeoElement)
+    //    gmesh->CreateGeoElement(EOned, nodind3, matInterface, index); // Creating interface element (GeoElement)
     
     
-    //Criando interface (Geralizado):
+    // Creating interface (Generalized):
     
     TPZVec<int64_t> nodint(2);
-    for(i = 0; i < (ny - 1); i++){
-        for(j = 0; j < (nx - 1); j++){
-            if(j>0&&j<(nx-1)){
+    for(int i = 0; i < (ny - 1); i++)
+    {
+        for(int j = 0; j < (nx - 1); j++)
+        {
+            if(j>0 && j<(nx-1))
+            {
                 nodint[0]=j+nx*i;
                 nodint[1]=j+nx*(i+1);
-                gmesh->CreateGeoElement(EOned, nodint, fmatInterface, index); //Criando elemento de interface (GeoElement)
+                gmesh->CreateGeoElement(EOned, nodint, fmatInterface, index); // Creating interface element (GeoElement)
                 
             }
-            if(i>0&&j<(ny-1)){
+            if(i>0 &&j <(ny-1))
+            {
                 nodint[0]=j+ny*i;
                 nodint[1]=j+ny*i+1;
-                gmesh->CreateGeoElement(EOned, nodint, fmatInterface, index); //Criando elemento de interface (GeoElement)
+                gmesh->CreateGeoElement(EOned, nodint, fmatInterface, index); // Creating interface element (GeoElement)
                 
             }
             
@@ -627,7 +419,7 @@ TPZGeoMesh *DarcyPTest::CreateGMesh(int nx, int ny, double hx, double hy)
 
  
 
-TPZCompEl *DarcyPTest::CreateInterfaceEl(TPZGeoEl *gel,TPZCompMesh &mesh,int64_t &index) {
+TPZCompEl *DarcyTest::CreateInterfaceEl(TPZGeoEl *gel,TPZCompMesh &mesh,int64_t &index) {
     if(!gel->Reference() && gel->NumInterfaces() == 0)
         return new TPZInterfaceElement(mesh,gel,index);
     
@@ -644,7 +436,7 @@ TPZCompEl *DarcyPTest::CreateInterfaceEl(TPZGeoEl *gel,TPZCompMesh &mesh,int64_t
 //}
 
 
-void DarcyPTest::Sol_exact(const TPZVec<REAL> &x, TPZVec<STATE> &sol, TPZFMatrix<STATE> &dsol){
+void DarcyTest::Sol_exact(const TPZVec<REAL> &x, TPZVec<STATE> &sol, TPZFMatrix<STATE> &dsol){
     
     dsol.Resize(3,2);
     sol.Resize(3);
@@ -677,7 +469,7 @@ void DarcyPTest::Sol_exact(const TPZVec<REAL> &x, TPZVec<STATE> &sol, TPZFMatrix
     
 }
 
-void DarcyPTest::F_source(const TPZVec<REAL> &x, TPZVec<STATE> &f, TPZFMatrix<STATE>& gradu){
+void DarcyTest::F_source(const TPZVec<REAL> &x, TPZVec<STATE> &f, TPZFMatrix<STATE>& gradu){
     
     f.resize(1);
     const REAL Pi=M_PI;
@@ -695,7 +487,7 @@ void DarcyPTest::F_source(const TPZVec<REAL> &x, TPZVec<STATE> &f, TPZFMatrix<ST
 
 
 
-TPZCompMesh *DarcyPTest::CMesh_v(TPZGeoMesh *gmesh, int Space, int pOrder)
+TPZCompMesh *DarcyTest::CMesh_v(TPZGeoMesh *gmesh, int Space, int pOrder)
 {
     
     //Criando malha computacional:
@@ -767,19 +559,16 @@ TPZCompMesh *DarcyPTest::CMesh_v(TPZGeoMesh *gmesh, int Space, int pOrder)
         
     }
     
-    
     cmesh->AutoBuild();
     cmesh->AdjustBoundaryElements();
     cmesh->CleanUpUnconnectedNodes();
-    
-    
     
     return cmesh;
     
 }
 
 
-TPZCompMesh *DarcyPTest::CMesh_p(TPZGeoMesh *gmesh, int Space, int pOrder)
+TPZCompMesh *DarcyTest::CMesh_p(TPZGeoMesh *gmesh, int Space, int pOrder)
 {
     
     if (Space==2||Space==3) {
@@ -870,7 +659,7 @@ TPZCompMesh *DarcyPTest::CMesh_p(TPZGeoMesh *gmesh, int Space, int pOrder)
     
 }
 
-TPZCompMesh *DarcyPTest::CMesh_m(TPZGeoMesh *gmesh, int Space, int pOrder, STATE visco, STATE permeability, STATE theta)
+TPZCompMesh *DarcyTest::CMesh_m(TPZGeoMesh *gmesh, int Space, int pOrder, STATE visco, STATE permeability, STATE theta)
 {
     
     //Criando malha computacional:
@@ -883,7 +672,7 @@ TPZCompMesh *DarcyPTest::CMesh_m(TPZGeoMesh *gmesh, int Space, int pOrder, STATE
     
     // Criando material:
     
-    TPZDarcyPMaterial *material = new TPZDarcyPMaterial(fmatID,fdim,Space,fviscosity,fpermeability,ftheta);//criando material que implementa a formulacao fraca do problema modelo
+    TPZDarcyMaterial *material = new TPZDarcyMaterial(fmatID,fdim,Space,fviscosity,fpermeability,ftheta);//criando material que implementa a formulacao fraca do problema modelo
     // Inserindo material na malha
     TPZAutoPointer<TPZFunction<STATE> > fp = new TPZDummyFunction<STATE> (F_source);
     TPZAutoPointer<TPZFunction<STATE> > solp = new TPZDummyFunction<STATE> (Sol_exact);
@@ -954,7 +743,7 @@ TPZCompMesh *DarcyPTest::CMesh_m(TPZGeoMesh *gmesh, int Space, int pOrder, STATE
 }
 
 
-void DarcyPTest::AddMultiphysicsInterfaces(TPZCompMesh &cmesh, int matfrom, int mattarget)
+void DarcyTest::AddMultiphysicsInterfaces(TPZCompMesh &cmesh, int matfrom, int mattarget)
 {
     TPZGeoMesh *gmesh = cmesh.Reference();
     int64_t nel = gmesh->NElements();

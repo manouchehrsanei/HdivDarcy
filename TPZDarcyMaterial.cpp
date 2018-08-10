@@ -1,20 +1,23 @@
-/*
- *  TPZDarcyPMaterial.cpp
- *  PZ
- *
- *  Created by Pablo G. S. Carvalho on 08/09/2016.
- *  Copyright 2016 __MyCompanyName__. All rights reserved.
- *
- */
 
-#include "TPZDarcyPMaterial.h"
+//
+//  TPZDarcyMaterial.cpp
+//  PZ
+//
+//  Created by Manouchehr on August 10, 2018.
+//
+//
+
+
+
+#include "TPZDarcyMaterial.h"
 #include "pzbndcond.h"
 #include "pzaxestools.h"
 #include "TPZMatWithMem.h"
 #include "pzfmatrix.h"
 
 
-TPZDarcyPMaterial::TPZDarcyPMaterial() : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(){
+TPZDarcyMaterial::TPZDarcyMaterial() : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >()
+{
 
     TPZFNMatrix<3,STATE> Vl(1,1,0.);
     this->SetDefaultMem(Vl);
@@ -24,7 +27,7 @@ TPZDarcyPMaterial::TPZDarcyPMaterial() : TPZMatWithMem<TPZFMatrix<STATE>, TPZDis
 
 ////////////////////////////////////////////////////////////////////
 
-TPZDarcyPMaterial::TPZDarcyPMaterial(int matid, int dimension, int space, STATE viscosity, STATE permeability, STATE theta) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(matid),fDimension(dimension),fSpace(space),fViscosity(viscosity),fk(permeability),fTheta(theta)
+TPZDarcyMaterial::TPZDarcyMaterial(int matid, int dimension, int space, STATE viscosity, STATE permeability, STATE theta) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(matid),fDimension(dimension),fSpace(space),fViscosity(viscosity),fk(permeability),fTheta(theta)
 {
 
     TPZFNMatrix<3,STATE> Vl(1,1,0.);
@@ -34,7 +37,7 @@ TPZDarcyPMaterial::TPZDarcyPMaterial(int matid, int dimension, int space, STATE 
 
 ////////////////////////////////////////////////////////////////////
 
-TPZDarcyPMaterial::TPZDarcyPMaterial(const TPZDarcyPMaterial &mat) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(mat),fDimension(mat.fDimension),fSpace(mat.fSpace),fViscosity(mat.fViscosity),fk(mat.fk), fTheta(mat.fTheta)
+TPZDarcyMaterial::TPZDarcyMaterial(const TPZDarcyMaterial &mat) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(mat),fDimension(mat.fDimension),fSpace(mat.fSpace),fViscosity(mat.fViscosity),fk(mat.fk), fTheta(mat.fTheta)
 {
     
     
@@ -42,7 +45,7 @@ TPZDarcyPMaterial::TPZDarcyPMaterial(const TPZDarcyPMaterial &mat) : TPZMatWithM
 
 ////////////////////////////////////////////////////////////////////
 
-TPZDarcyPMaterial::~TPZDarcyPMaterial(){
+TPZDarcyMaterial::~TPZDarcyMaterial(){
     
     
 }
@@ -50,7 +53,7 @@ TPZDarcyPMaterial::~TPZDarcyPMaterial(){
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::FillDataRequirements(TPZMaterialData &data)
+void TPZDarcyMaterial::FillDataRequirements(TPZMaterialData &data)
 {
     TPZMaterial::FillDataRequirements(data);
     data.fNeedsSol = true;
@@ -59,7 +62,7 @@ void TPZDarcyPMaterial::FillDataRequirements(TPZMaterialData &data)
 ////////////////////////////////////////////////////////////////////
 
 
-void TPZDarcyPMaterial::FillDataRequirements(TPZVec<TPZMaterialData> &datavec)
+void TPZDarcyMaterial::FillDataRequirements(TPZVec<TPZMaterialData> &datavec)
 {
     int ndata = datavec.size();
     for (int idata=0; idata < ndata ; idata++) {
@@ -71,7 +74,7 @@ void TPZDarcyPMaterial::FillDataRequirements(TPZVec<TPZMaterialData> &datavec)
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::FillBoundaryConditionDataRequirement(int type,TPZVec<TPZMaterialData> &datavec)
+void TPZDarcyMaterial::FillBoundaryConditionDataRequirement(int type,TPZVec<TPZMaterialData> &datavec)
 {
     int ndata = datavec.size();
     for (int idata=0; idata < ndata ; idata++) {
@@ -83,7 +86,7 @@ void TPZDarcyPMaterial::FillBoundaryConditionDataRequirement(int type,TPZVec<TPZ
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::FillDataRequirementsInterface(TPZMaterialData &data)
+void TPZDarcyMaterial::FillDataRequirementsInterface(TPZMaterialData &data)
 {
     data.fNeedsNormal = true;
 }
@@ -91,7 +94,7 @@ void TPZDarcyPMaterial::FillDataRequirementsInterface(TPZMaterialData &data)
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::Print(std::ostream &out) {
+void TPZDarcyMaterial::Print(std::ostream &out) {
     out << "\t Base class print:\n";
     out << " name of material : " << this->Name() << "\n";
     TPZMaterial::Print(out);
@@ -99,7 +102,8 @@ void TPZDarcyPMaterial::Print(std::ostream &out) {
 
 ////////////////////////////////////////////////////////////////////
 
-int TPZDarcyPMaterial::VariableIndex(const std::string &name) {
+int TPZDarcyMaterial::VariableIndex(const std::string &name)
+{
     
     if (!strcmp("P", name.c_str()))  return 0;
     if (!strcmp("V", name.c_str()))  return 1;
@@ -115,7 +119,8 @@ int TPZDarcyPMaterial::VariableIndex(const std::string &name) {
 
 ////////////////////////////////////////////////////////////////////
 
-int TPZDarcyPMaterial::NSolutionVariables(int var) {
+int TPZDarcyMaterial::NSolutionVariables(int var)
+{
     
     switch(var) {
             
@@ -141,8 +146,8 @@ int TPZDarcyPMaterial::NSolutionVariables(int var) {
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::Solution(TPZVec<TPZMaterialData> &datavec, int var, TPZVec<STATE> &Solout) {
-    
+void TPZDarcyMaterial::Solution(TPZVec<TPZMaterialData> &datavec, int var, TPZVec<STATE> &Solout)
+{
     
     //itapopo conferir esse metodo
     
@@ -215,7 +220,7 @@ void TPZDarcyPMaterial::Solution(TPZVec<TPZMaterialData> &datavec, int var, TPZV
 ////////////////////////////////////////////////////////////////////
 
 // Divergence on deformed element
-void TPZDarcyPMaterial::ComputeDivergenceOnDeformed(TPZVec<TPZMaterialData> &datavec, TPZFMatrix<STATE> &DivergenceofPhi)
+void TPZDarcyMaterial::ComputeDivergenceOnDeformed(TPZVec<TPZMaterialData> &datavec, TPZFMatrix<STATE> &DivergenceofPhi)
 {
     
     //itapopo conferir esse método. Foi copiado do TPZDarcyFlow3D
@@ -292,7 +297,7 @@ void TPZDarcyPMaterial::ComputeDivergenceOnDeformed(TPZVec<TPZMaterialData> &dat
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::Write(TPZStream &buf, int withclassid) const{
+void TPZDarcyMaterial::Write(TPZStream &buf, int withclassid) const{
     
     TPZDiscontinuousGalerkin::Write(buf, withclassid);
     
@@ -301,14 +306,14 @@ void TPZDarcyPMaterial::Write(TPZStream &buf, int withclassid) const{
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::Read(TPZStream &buf, void *context) {
+void TPZDarcyMaterial::Read(TPZStream &buf, void *context) {
     
     TPZDiscontinuousGalerkin::Read(buf, context);
     
 }
 
 // Divergence on master element
-void TPZDarcyPMaterial::ComputeDivergenceOnMaster(TPZVec<TPZMaterialData> &datavec, TPZFMatrix<STATE> &DivergenceofPhi, STATE &DivergenceofU)
+void TPZDarcyMaterial::ComputeDivergenceOnMaster(TPZVec<TPZMaterialData> &datavec, TPZFMatrix<STATE> &DivergenceofPhi, STATE &DivergenceofU)
 {
     int ublock = 0;
     
@@ -390,7 +395,7 @@ void TPZDarcyPMaterial::ComputeDivergenceOnMaster(TPZVec<TPZMaterialData> &datav
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::FillGradPhi(TPZMaterialData &dataV, TPZVec< TPZFMatrix<REAL> > &GradPhi){
+void TPZDarcyMaterial::FillGradPhi(TPZMaterialData &dataV, TPZVec< TPZFMatrix<REAL> > &GradPhi){
     
     
     TPZFMatrix<REAL> &dphiV = dataV.dphix;
@@ -422,7 +427,7 @@ void TPZDarcyPMaterial::FillGradPhi(TPZMaterialData &dataV, TPZVec< TPZFMatrix<R
 
 // Contricucao dos elementos internos
 
-void TPZDarcyPMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef){
+void TPZDarcyMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef){
     
     
 #ifdef PZDEBUG
@@ -559,7 +564,7 @@ void TPZDarcyPMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight
 }
 
 
-void TPZDarcyPMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef, TPZBndCond &bc){
+void TPZDarcyMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef, TPZBndCond &bc){
     
     
     
@@ -799,7 +804,7 @@ void TPZDarcyPMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weig
 
 ////////////////////////////////////////////////////////////////////
 
-void TPZDarcyPMaterial::ContributeInterface(TPZMaterialData &data, TPZVec<TPZMaterialData> &datavecleft, TPZVec<TPZMaterialData> &datavecright, REAL weight, TPZFMatrix<STATE> &ek,TPZFMatrix<STATE> &ef){
+void TPZDarcyMaterial::ContributeInterface(TPZMaterialData &data, TPZVec<TPZMaterialData> &datavecleft, TPZVec<TPZMaterialData> &datavecright, REAL weight, TPZFMatrix<STATE> &ek,TPZFMatrix<STATE> &ef){
     
     
 #ifdef PZDEBUG
@@ -978,7 +983,7 @@ void TPZDarcyPMaterial::ContributeInterface(TPZMaterialData &data, TPZVec<TPZMat
 }
 
 
-void TPZDarcyPMaterial::ContributeBCInterface(TPZMaterialData &data, TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef, TPZBndCond &bc){
+void TPZDarcyMaterial::ContributeBCInterface(TPZMaterialData &data, TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef, TPZBndCond &bc){
     
     
     
@@ -1076,7 +1081,7 @@ void TPZDarcyPMaterial::ContributeBCInterface(TPZMaterialData &data, TPZVec<TPZM
 
 ////////////////////////////////////////////////////////////////////
 template <typename TVar>
-TVar TPZDarcyPMaterial::Inner(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
+TVar TPZDarcyMaterial::Inner(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
     
     //inner product of two tensors
     
@@ -1106,7 +1111,7 @@ TVar TPZDarcyPMaterial::Inner(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
 
 ////////////////////////////////////////////////////////////////////
 template <typename TVar>
-TVar TPZDarcyPMaterial::InnerVec(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
+TVar TPZDarcyMaterial::InnerVec(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
     
     //inner product of two vectors
     
@@ -1133,7 +1138,7 @@ TVar TPZDarcyPMaterial::InnerVec(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
 
 ////////////////////////////////////////////////////////////////////
 
-STATE TPZDarcyPMaterial::Tr( TPZFMatrix<REAL> &GradU ){
+STATE TPZDarcyMaterial::Tr( TPZFMatrix<REAL> &GradU ){
     
 #ifdef DEBUG
     if( GradU.Rows() != GradU.Cols() ) {
@@ -1152,7 +1157,7 @@ STATE TPZDarcyPMaterial::Tr( TPZFMatrix<REAL> &GradU ){
 
 
 /// transform a H1 data structure to a vector data structure
-void TPZDarcyPMaterial::FillVecShapeIndex(TPZMaterialData &data)
+void TPZDarcyMaterial::FillVecShapeIndex(TPZMaterialData &data)
 {
     data.fNormalVec.Resize(fDimension,fDimension);
     data.fNormalVec.Identity();
@@ -1167,7 +1172,7 @@ void TPZDarcyPMaterial::FillVecShapeIndex(TPZMaterialData &data)
 
 
 
-void TPZDarcyPMaterial::Errors(TPZVec<TPZMaterialData> &data, TPZVec<STATE> &u_exact, TPZFMatrix<STATE> &du_exact, TPZVec<REAL> &errors)
+void TPZDarcyMaterial::Errors(TPZVec<TPZMaterialData> &data, TPZVec<STATE> &u_exact, TPZFMatrix<STATE> &du_exact, TPZVec<REAL> &errors)
 {
 
     errors.Resize(NEvalErrors());
