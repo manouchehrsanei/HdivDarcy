@@ -100,13 +100,13 @@ int main(int argc, char *argv[])
     
     
     int h_level = 2;
-    double hx   = 1.; // Dimensions in X and Y of the domain
-    double hy   = 1.; // Dimensions in X and Y of the domain
+    double hx   = 0.1; // Dimensions in X and Y of the domain
+    double hy   = 1.0; // Dimensions in X and Y of the domain
     int nelx    = h_level; // Number of elements in X and Y
     int nely    = h_level; // Number of elements in X and Y
     int nx      = nelx+1; // Number of nodes in X and Y
     int ny      = nely+1; // Number of nodes in X and Y
-    int pOrder  = 2; // Polynomial order of approximation
+    int pOrder  = 1; // Polynomial order of approximation
     
     
     DarcyTest * Test1 = new DarcyTest();

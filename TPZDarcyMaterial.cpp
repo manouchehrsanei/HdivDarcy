@@ -795,8 +795,6 @@ void TPZDarcyMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weigh
             break;
     }
     
-    
-    
 }
 
 
@@ -985,8 +983,6 @@ void TPZDarcyMaterial::ContributeInterface(TPZMaterialData &data, TPZVec<TPZMate
 
 void TPZDarcyMaterial::ContributeBCInterface(TPZMaterialData &data, TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef, TPZBndCond &bc){
     
-    
-    
 #ifdef IsH1
     //Caso H1 -> return
     return;
@@ -1071,10 +1067,7 @@ void TPZDarcyMaterial::ContributeBCInterface(TPZMaterialData &data, TPZVec<TPZMa
             ef(i+nshapeV,0) += fTheta*factf2*0.;
             
         }
-        
     }
-    
-    
 }
 
 
@@ -1105,7 +1098,6 @@ TVar TPZDarcyMaterial::Inner(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
     }
     
     return Val;
-    
 }
 
 
@@ -1131,7 +1123,6 @@ TVar TPZDarcyMaterial::InnerVec(TPZFMatrix<TVar> &S, TPZFMatrix<TVar> &T){
     }
     
     return Val;
-    
 }
 
 
@@ -1198,7 +1189,6 @@ void TPZDarcyMaterial::Errors(TPZVec<TPZMaterialData> &data, TPZVec<STATE> &u_ex
     TPZFNMatrix<2,STATE> dsolxy(2,2), dsolxyp(2,1);
     TPZAxesTools<STATE>::Axes2XYZ(dsol, dsolxy, data[vindex].axes);
     TPZAxesTools<STATE>::Axes2XYZ(dsolp, dsolxyp, data[pindex].axes);
-    
     
     
     int shift = 3;

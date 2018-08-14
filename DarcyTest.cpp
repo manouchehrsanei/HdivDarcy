@@ -551,7 +551,8 @@ TPZCompMesh *DarcyTest::CMesh_v(TPZGeoMesh *gmesh, int Space, int pOrder)
     //Criando elementos computacionais que gerenciarão o espaco de aproximacao da malha:
     
     int ncel = cmesh->NElements();
-    for(int i =0; i<ncel; i++){
+    for(int i =0; i<ncel; i++)
+    {
         TPZCompEl * compEl = cmesh->ElementVec()[i];
         if(!compEl) continue;
         TPZInterfaceElement * facel = dynamic_cast<TPZInterfaceElement *>(compEl);
@@ -632,12 +633,12 @@ TPZCompMesh *DarcyTest::CMesh_p(TPZGeoMesh *gmesh, int Space, int pOrder)
     //Criando elementos computacionais que gerenciarão o espaco de aproximação da malha
     
     int ncel = cmesh->NElements();
-    for(int i =0; i<ncel; i++){
+    for(int i =0; i<ncel; i++)
+    {
         TPZCompEl * compEl = cmesh->ElementVec()[i];
         if(!compEl) continue;
         TPZInterfaceElement * facel = dynamic_cast<TPZInterfaceElement *>(compEl);
         if(facel)DebugStop();
-        
     }
     std::set<int> materialids;
     materialids.insert(fmatID);
@@ -717,8 +718,6 @@ TPZCompMesh *DarcyTest::CMesh_m(TPZGeoMesh *gmesh, int Space, int pOrder, STATE 
     cmesh->InsertMaterialObject(BCPoint); //Insere material na malha
     
     
-    
-    
 #ifdef PZDEBUG
 //    int ncel = cmesh->NElements();
 //    for(int i =0; i<ncel; i++){
@@ -729,7 +728,6 @@ TPZCompMesh *DarcyTest::CMesh_m(TPZGeoMesh *gmesh, int Space, int pOrder, STATE 
 //        
 //    }
 #endif
-    
     
     
     //Criando elementos computacionais que gerenciarão o espaco de aproximação da malha:
