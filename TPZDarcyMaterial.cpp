@@ -27,7 +27,7 @@ TPZDarcyMaterial::TPZDarcyMaterial() : TPZMatWithMem<TPZFMatrix<STATE>, TPZDisco
 
 ////////////////////////////////////////////////////////////////////
 
-TPZDarcyMaterial::TPZDarcyMaterial(int matid, int dimension, int space, STATE viscosity, STATE permeability, STATE theta) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(matid),fDimension(dimension),fSpace(space),fViscosity(viscosity),fk(permeability),fTheta(theta)
+TPZDarcyMaterial::TPZDarcyMaterial(int matid, int dimension, STATE viscosity, STATE permeability, STATE theta) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(matid),fDimension(dimension),fViscosity(viscosity),fk(permeability),fTheta(theta)
 {
 
     TPZFNMatrix<3,STATE> Vl(1,1,0.);
@@ -37,7 +37,7 @@ TPZDarcyMaterial::TPZDarcyMaterial(int matid, int dimension, int space, STATE vi
 
 ////////////////////////////////////////////////////////////////////
 
-TPZDarcyMaterial::TPZDarcyMaterial(const TPZDarcyMaterial &mat) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(mat),fDimension(mat.fDimension),fSpace(mat.fSpace),fViscosity(mat.fViscosity),fk(mat.fk), fTheta(mat.fTheta)
+TPZDarcyMaterial::TPZDarcyMaterial(const TPZDarcyMaterial &mat) : TPZMatWithMem<TPZFMatrix<STATE>, TPZDiscontinuousGalerkin >(mat),fDimension(mat.fDimension),fViscosity(mat.fViscosity),fk(mat.fk), fTheta(mat.fTheta)
 {
     
     
@@ -431,14 +431,13 @@ void TPZDarcyMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight,
     
     
 #ifdef PZDEBUG
-//    //2 = 1 Vel space + 1 Press space
-//    int nref =  datavec.size();
-//    if (nref != 2 ) {
-//        std::cout << " Erro. The size of the datavec is different from 2 \n";
-//        DebugStop();
-//    }
+    //2 = 1 Vel space + 1 Press space
+    int nref =  datavec.size();
+    if (nref != 2 ) {
+        std::cout << " Erro. The size of the datavec is different from 2 \n";
+        DebugStop();
+    }
 #endif
-    
     
     
     const int vindex = this->VIndex();
@@ -467,7 +466,8 @@ void TPZDarcyMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight,
     nshapeV = datavec[vindex].fVecShapeIndex.NElements();
     
     TPZVec<STATE> f(fDimension);
-    for (int e=0; e<fDimension; e++) {
+    for (int e=0; e<fDimension; e++)
+    {
         f[e] = 0.;
     }
     
@@ -483,9 +483,11 @@ void TPZDarcyMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight,
         int iphi = datavec[vindex].fVecShapeIndex[i].second;
         int ivec = datavec[vindex].fVecShapeIndex[i].first;
         TPZFNMatrix<4> GradVi(fDimension,fDimension);
-        for (int e=0; e<fDimension; e++) {
+        for (int e=0; e<fDimension; e++)
+        {
             phiVi(e,0) = phiV(iphi,0)*datavec[vindex].fNormalVec(e,ivec);
-            for (int f=0; f<fDimension; f++) {
+            for (int f=0; f<fDimension; f++)
+            {
                 GradVi(e,f) = datavec[vindex].fNormalVec(e,ivec)*dphiVx(f,iphi);
                 
             }
@@ -493,12 +495,14 @@ void TPZDarcyMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight,
         }
         
         // matrix A - velocity * test-funtion velocity
-        for(int j = 0; j < nshapeV; j++){
+        for(int j = 0; j < nshapeV; j++)
+        {
             int jphi = datavec[vindex].fVecShapeIndex[j].second;
             int jvec = datavec[vindex].fVecShapeIndex[j].first;
             
             TPZFNMatrix<4> GradVj(fDimension,fDimension);
-            for (int e=0; e<fDimension; e++) {
+            for (int e=0; e<fDimension; e++)
+            {
                 phiVj(e,0) = phiV(jphi,0)*datavec[vindex].fNormalVec(e,jvec);
                 
             }
@@ -559,14 +563,11 @@ void TPZDarcyMaterial::Contribute(TPZVec<TPZMaterialData> &datavec, REAL weight,
         ef(nshapeV+i,0) += factf;
         
     }
- 
-    
 }
 
 
-void TPZDarcyMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef, TPZBndCond &bc){
-    
-    
+void TPZDarcyMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weight, TPZFMatrix<STATE> &ek, TPZFMatrix<STATE> &ef, TPZBndCond &bc)
+{
     
 #ifdef PZDEBUG
     //2 = 1 Vel space + 1 Press space
@@ -581,7 +582,8 @@ void TPZDarcyMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weigh
     const int vindex = this->VIndex();
     const int pindex = this->PIndex();
     
-    if (datavec[vindex].fVecShapeIndex.size() == 0) {
+    if (datavec[vindex].fVecShapeIndex.size() == 0)
+    {
         FillVecShapeIndex(datavec[vindex]);
     }
     
@@ -638,74 +640,26 @@ void TPZDarcyMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weigh
                 p_D = vbc[2];
             }
             
-            if(fSpace==1){
+            for(int i = 0; i < nshapeV; i++ )
+            {
                 
-                for(int i = 0; i < nshapeV; i++ )
-                {
+                //Adaptação para Hdiv
+                
+                TPZManVector<REAL> n = datavec[0].normal;
+                
+                REAL vh_n = v_h[0];
+                REAL v_n = n[0] * v_2[0] + n[1] * v_2[1];
+                
+                ef(i,0) += -weight * gBigNumber * (vh_n - v_n) * phiV(i,0);
+                
+                for(int j = 0; j < nshapeV; j++){
                     
-                    //Adaptação para Hdiv
-                    
-                    TPZManVector<REAL> n = datavec[0].normal;
-                    
-                    REAL vh_n = v_h[0];
-                    REAL v_n = n[0] * v_2[0] + n[1] * v_2[1];
-                    
-                    ef(i,0) += -weight * gBigNumber * (vh_n - v_n) * phiV(i,0);
-                    
-                    for(int j = 0; j < nshapeV; j++){
-                        
-                        ek(i,j) += weight * gBigNumber * phiV(j,0) * phiV(i,0);
-                        
-                    }
+                    ek(i,j) += weight * gBigNumber * phiV(j,0) * phiV(i,0);
                     
                 }
                 
-            }else{
-                
-                for(int i = 0; i < nshapeV; i++ )
-                {
-                    int iphi = datavec[vindex].fVecShapeIndex[i].second;
-                    int ivec = datavec[vindex].fVecShapeIndex[i].first;
-                    
-                    for (int e=0; e<fDimension; e++) {
-                        phiVi(e,0)=datavec[vindex].fNormalVec(e,ivec)*phiV(iphi,0);
-                    }
-                    
-                    
-                    //Adaptação para Hdiv
-                    
-                    STATE factef=0.0;
-                    for(int is=0; is<gy ; is++){
-                        factef += -1.0*(v_h[is] - v_2(is,0)) * phiVi(is,0);
-                    }
-                    
-                    ef(i,0) += weight * gBigNumber * factef;
-                    
-                    
-                    for(int j = 0; j < nshapeV; j++){
-                        int jphi = datavec[vindex].fVecShapeIndex[j].second;
-                        int jvec = datavec[vindex].fVecShapeIndex[j].first;
-                        
-                        
-                        
-                        for (int e=0; e<fDimension; e++) {
-                            phiVj(e,0)=datavec[vindex].fNormalVec(e,jvec)*phiV(jphi,0);
-                        }
-                        
-                        //Adaptação para Hdiv
-                        
-                        STATE factek=0.0;
-                        for(int is=0; is<gy ; is++){
-                            factek += phiVj(is,0) * phiVi(is,0);
-                        }
-                        
-                        ek(i,j) += weight * gBigNumber * factek;
-                        
-                    }
-                    
-                }
             }
-            
+
         }
             break;
             
@@ -764,7 +718,7 @@ void TPZDarcyMaterial::ContributeBC(TPZVec<TPZMaterialData> &datavec, REAL weigh
             
             break;
             
-        case 5: //Ponto pressao
+        case 3: //Ponto pressao
         {
             p_D = bc.Val2()(0,0);
             
@@ -1052,21 +1006,11 @@ void TPZDarcyMaterial::ContributeBCInterface(TPZMaterialData &data, TPZVec<TPZMa
         
         REAL v_t = n[1] * v_2[0] + n[0] * v_2[1];
         
-        if(fSpace==1){
+        STATE factf=(-1.) * weight * v_t * phiP(i,0) ;
             
-            STATE factf=(-1.) * weight * v_t * phiP(i,0) ;
-            
-            ef(i+nshapeV,0) += fTheta*factf*0. ;
-            
-        }
-        
-        if(fSpace==3){
-            
-            STATE factf2=(-1.) * weight * v_n  * phiP(i,0) ;
-            
-            ef(i+nshapeV,0) += fTheta*factf2*0.;
-            
-        }
+        ef(i+nshapeV,0) += fTheta*factf*0. ;
+
+
     }
 }
 
@@ -1203,44 +1147,7 @@ void TPZDarcyMaterial::Errors(TPZVec<TPZMaterialData> &data, TPZVec<STATE> &u_ex
     }
     
     ////////////////////////////////////////////////// H1 / GD
-    
-    if(fSpace==2){
-        
-        //values[2] : erro em semi norma H1
-        errors[2] = 0.;
-        TPZFMatrix<STATE> S(Dimension(),Dimension(),0.0);
-        for(int i=0; i<Dimension(); i++) {
-            for(int j=0; j<Dimension(); j++) {
-                S(i,j) = dsolxy(i,j) - du_exact(i,j);
-            }
-        }
-        
-        diff = Inner(S, S);
-        errors[2]  += diff;
-        
-        //values[0] : erro em norma H1 <=> norma Energia
-        errors[0]  = errors[1]+errors[2];
-        
-    }
-    
-    if(fSpace==3){
-        
-        //values[2] : erro em semi norma H1
-        errors[2] = 0.;
-        TPZFMatrix<STATE> S(Dimension(),Dimension(),0.0);
-        for(int i=0; i<Dimension(); i++) {
-            for(int j=0; j<Dimension(); j++) {
-                S(i,j) = dsolxy(i,j) - du_exact(i,j);
-            }
-        }
-        
-        diff = Inner(S, S);
-        errors[2]  += diff;
-        
-        //values[0] : erro em norma H1 <=> norma Energia
-        errors[0]  = errors[1]+errors[2];
-        
-    }
+
     
     
     ////////////////////////////////////////////////// H1 / GD
@@ -1267,14 +1174,13 @@ void TPZDarcyMaterial::Errors(TPZVec<TPZMaterialData> &data, TPZVec<STATE> &u_ex
     
     ////////////////////////////////////////////////// HDIV
     
-    if(fSpace==1){
+
         /// erro norma HDiv
         
-        STATE Div_exact=0., Div=0.;
-        for(int i=0; i<Dimension(); i++) {
-            Div_exact+=du_exact(i,i);
-            Div+=dsolxy(i,i);
-        }
+      STATE Div_exact=0., Div=0.;
+     for(int i=0; i<Dimension(); i++) {
+        Div_exact+=du_exact(i,i);
+        Div+=dsolxy(i,i);
         
         diff = Div-Div_exact;
         

@@ -51,7 +51,7 @@ public:
     /** Creates a material object and inserts it in the vector of
      *  material pointers of the mesh.
      */
-    TPZDarcyMaterial(int matid, int dimension, int space, STATE viscosity, STATE permeability, STATE theta);
+    TPZDarcyMaterial(int matid, int dimension, STATE viscosity, STATE permeability, STATE theta);
     
     
     /** Creates a material object based on the referred object and
